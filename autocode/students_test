@@ -131,6 +131,29 @@ func TestNewNil(t *testing.T){
 	}
 }
 
+func TestNewNotNil(t *testing.T){
+	t.Parallel()
+	tests:=map[string]struct{
+		matrix string
+		row, col int
+	}{
+		"one":{"1 1 2",1,3},
+		"two":{"1 1 2\n3 5 8",2,3},
+		"two more":{"1 1 2\n3 5 8\n13 21 34",3,3},
+	}
+	for i,test:=range tests{
+		t.Run(i,func(t *testing.T){
+			t.Parallel()
+			expected,err:=New(test.matrix)
+			assert.Nil(t,err)
+			assert.NotNil(t,expected)
+			assert.NotNil(t,expected.data)
+			assert.Equal(t,test.row,expected.rows)
+			assert.Equal(t,test.col,expected.cols)
+		})
+	}
+}
+
 func TestRows(t *testing.T){
 	t1,err:=New("1 1 2\n3 5 8")
 	checkErr(err)
