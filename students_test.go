@@ -4,8 +4,6 @@ import (
 	"os"
 	"testing"
 	"time"
-	"fmt"
-	"strconv"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -117,25 +115,19 @@ func TestLen(t *testing.T){
 	// }
  }
 
-func TestNew(t *testing.T){
-	_,errs:=strconv.Atoi("epam")
-	tests:=[]struct{
-		s string
-		expected *Matrix
-		err error
-	}{
-		{"1 1 2\n3 5 8", &Matrix{2,3, []int{1,1,2,3,5,8}},nil},
-		{"1 1 2\n3 5", nil, fmt.Errorf("Rows need to be the same length")},
-		{"epam 1 2\n3 5 8", nil,errs},
+func TestNewNil(t *testing.T){
+	t.Parallel()
+	tests:=map[string]string{
+		"nil" : "",
+		"matrix" : "0 2\n0 5 8",
 	}
-	for i,v:=range tests{
-		got ,err:=New(v.s)
-		if err!=nil && v.err!=nil && err.Error() != v.err.Error(){
-			t.Errorf("[%d] Error happend while not expected: %s", i, err.Error())
-		} 
-		if !equal(got,v.expected){
-			t.Errorf("[%d] expected: %v, got %d", i, v.expected, got)
-		}
+	for i, test:=range tests{
+		t.Run(i,func(t *testing.T){
+			t.Parallel()
+			expected,err:=New(test)
+			assert.NotNil(t,err)
+			assert.Nil(t,expected)
+		})
 	}
 }
 
