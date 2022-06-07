@@ -196,28 +196,48 @@ func getMatrix(matrix1, matrix2 [][]int)bool{
 	return true
 }
 
-func TestSet(t *testing.T){
-	t1,err:=New("3 5 8\n13 21 34")
-	checkErr(err)
-	t2,err:=New("3 5 8\n13 21 34")
-	checkErr(err)
-	t3,err:=New("1 1 2\n3 5 8\n13 21 34")
-	checkErr(err)
+func TestSetFails(t *testing.T) {
+	t.Parallel()
 
-	tests := []struct{
-		matrix *Matrix
-		row,col,val int
-		expected bool
+	matrix, _ := New("0 1 2")
+	tData := map[string]struct{
+		row int
+		col int
 	}{
-		{t1,0, 2, 8, true},
-		{t2,-1, -1, 10,false},
-		{t3,2, 0, 13, true},
+		"negative row": {-1, 0},
+		"row out of range": {1, 0},
+		"negative col": {0, -1},
+		"col out of range": {0, 3}}
+
+	for name, value := range tData {
+		tCase := value
+		t.Run(name, func (t *testing.T) {
+			t.Parallel()
+			assert.False(t, matrix.Set(tCase.row, tCase.col, 100))
+		})
 	}
-	for i,v:=range tests{
-		got :=v.matrix.Set(v.row,v.col,v.val)
-		if got!=v.expected{
-			t.Errorf("[%d] expected:%v, got %v",i,v.expected,got)
-		}
+}
+
+func TestSet(t *testing.T) {
+	t.Parallel()
+
+	tData := map[string]struct{
+		input string
+		row int
+		col int
+		value int
+	}{
+		"single row": {"0 1 2", 0, 1, 3},
+		"multiple rows": {"0 1 2\n3 4 5\n6 7 8", 2, 2, 9}}
+
+	for name, value := range tData {
+		tCase := value
+		t.Run(name, func (t *testing.T) {
+			t.Parallel()
+			matrix, _ := New(tCase.input)
+			assert.True(t, matrix.Set(tCase.row, tCase.col, tCase.value))
+			assert.Equal(t, tCase.value, matrix.Rows()[tCase.row][tCase.col])
+		})
 	}
 }
 
