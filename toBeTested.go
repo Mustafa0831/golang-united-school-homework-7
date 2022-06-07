@@ -33,6 +33,7 @@ func (p People) Len() int {
 func (p People) Less(i, j int) bool {
 	if p[i].birthDay.Unix() == p[j].birthDay.Unix() {
 		if p[i].firstName == p[j].firstName {
+			fmt.Println(p[i].firstName)
 			return p[i].lastName < p[j].lastName
 		}
 		return p[i].firstName < p[j].firstName
