@@ -99,20 +99,6 @@ func TestLen(t *testing.T){
 	p.Swap(1,2)
 	assert.Equalf(t,p[1], p3,"Ayzada earlier")
 	assert.Equalf(t,p[2], p2,"Mukhamet later")
-	// tests:=[]struct{
-	// 	actual int
-	// 	current int
-	// 	expected bool
-	// }{
-	// 	{0, 0, true},
-	// 	{1, 2, false},
-	// 	{2, 2, true},
-	// }
-	// for i, v:=range tests{
-	// 	if p[v.current]==p[v.actual]&&p[v.actual]==p[v.current]!= v.expected{
-	// 		t.Errorf("[%d] expected: %v, got : %v", i,v.expected,p[v.current]==p[v.actual]&&p[v.actual]==p[v.current])
-	// 	}
-	// }
  }
 
 func TestNewNil(t *testing.T){
@@ -137,9 +123,9 @@ func TestNewNotNil(t *testing.T){
 		matrix string
 		row, col int
 	}{
-		"one":{"1 1 2",1,3},
-		"two":{"1 1 2\n3 5 8",2,3},
-		"two more":{"1 1 2\n3 5 8\n13 21 34",3,3},
+		"one":{"0 1 2",1,3},
+		"two":{"0 1 2\n3 5 8",2,3},
+		"two more":{"0 1 2\n 3 5 8\n 13 21 34",3,3},
 	}
 	for i,test:=range tests{
 		t.Run(i,func(t *testing.T){
@@ -155,22 +141,21 @@ func TestNewNotNil(t *testing.T){
 }
 
 func TestRows(t *testing.T){
-	t1,err:=New("1 1 2\n3 5 8")
-	checkErr(err)
-	t2,err:=New("1 1 2\n3 5 8\n13 21 34")
-	checkErr(err)
-	tests:=[]struct{
-		matrix *Matrix
+	t.Parallel()
+	tests:=map[string]struct{
+		matrix string
 		expected [][]int
 	}{
-		{t1, [][]int{{1,1,2}, {3,5,8}}},
-		{t2, [][]int{{1,1,2}, {3,5,8},{13,21,34}}},
+		"one":{"0 1 2",[][]int{{0, 1, 2}}},
+		"two":{"0 1 2\n3 5 8",[][]int{{0, 1, 2},{3,5,8}}},
 	}
 	for i,v:=range tests{
-		got:=v.matrix.Rows()
-		if !getMatrix(got,v.expected){
-			t.Errorf("[%d] expected: %v, got %d", i, v.expected,got)
-		}
+		t.Run(i, func(t *testing.T){
+			t.Parallel()
+			m,_:=New(v.matrix)
+			
+			assert.Equal(t,v.expected,m.Rows())
+		})
 	}
 }
 
