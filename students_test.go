@@ -123,9 +123,9 @@ func TestNewNotNil(t *testing.T){
 		matrix string
 		row, col int
 	}{
-		"one":{"0 1 2",1,3},
-		"two":{"0 1 2\n3 5 8",2,3},
-		"two more":{"0 1 2\n 3 5 8\n 13 21 34",3,3},
+		"single row": {"0 1 2 3", 1, 4},
+		"multiple rows": {"0 1 2\n3 4 5\n6 7 8", 3, 3},
+		"multiple rows with leading and trailing spaces": {" 0 1 2\n 3 4 5 \n6 7 8 ", 3, 3},
 	}
 	for i,test:=range tests{
 		t.Run(i,func(t *testing.T){
@@ -146,8 +146,8 @@ func TestRows(t *testing.T){
 		matrix string
 		expected [][]int
 	}{
-		"one":{"0 1 2",[][]int{{0, 1, 2}}},
-		"two":{"0 1 2\n3 5 8",[][]int{{0, 1, 2},{3,5,8}}},
+		"single row": {"0 1 2 3", [][]int{{0, 1, 2, 3}}},
+		"multiple rows": {"0 1 2\n3 4 5\n6 7 8", [][]int{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}}},
 	}
 	for i,v:=range tests{
 		t.Run(i, func(t *testing.T){
@@ -160,19 +160,21 @@ func TestRows(t *testing.T){
 }
 
 func TestCols(t *testing.T){
-	t1,err:=New("1 1 2\n3 5 8")
-	checkErr(err)
-	tests:=[]struct{
-		matrix *Matrix
+	t.Parallel()
+	tests:=map[string]struct{
+		matrix string
 		expected [][]int
 	}{
-		{t1, [][]int{{1,3},{1,5}, {2,8}}},
+		"single row": {"0 1 2 3", [][]int{{0}, {1}, {2}, {3}}},
+		"multiple rows": {"0 1 2\n3 4 5\n6 7 8", [][]int{{0, 3, 6}, {1, 4, 7}, {2, 5, 8}}},
 	}
 	for i,v:=range tests{
-		got:=v.matrix.Cols()
-		if !getMatrix(got,v.expected){
-			t.Errorf("[%d] expected: %v, got %d", i, v.expected,got)
-		}
+		t.Run(i, func(t *testing.T){
+			t.Parallel()
+			m,_:=New(v.matrix)
+			
+			assert.Equal(t,v.expected,m.Cols())
+		})
 	}
 }
 
