@@ -6,7 +6,7 @@ import (
 	"time"
 	"fmt"
 	"strconv"
-
+	"github.com/stretchr/testify/assert"
 )
 
 // DO NOT EDIT THIS FUNCTION
@@ -37,14 +37,14 @@ func TestLen(t *testing.T){
 	p2:=Person{"Mukhamet","Ustaz",d2}
 	p3:=Person{"Ayzada","Ustaz",d3}
 
-	two:=People{p1,p2}
 	three:=People{p1,p2,p3}
+	zero:=People{}
 	tests:=[]struct{
 		actual People
 		expected int
 	}{
-		{two,2},
 		{three,3},
+		{zero,0},
 	}
 	for _,v:=range tests{
 		if v.actual.Len()!=v.expected{
@@ -85,34 +85,36 @@ func TestLen(t *testing.T){
  }
 
  func TestSwap(t *testing.T){
+	t.Parallel()
 	d1,err:=time.Parse(date,"1997-08-31")
 	checkErr(err)
-	p1:=Person{"Mustafa","Ustaz",d1}
 	d2,err:=time.Parse(date,"1994-09-09")
 	checkErr(err)
 	d3,err:=time.Parse(date,"2004-01-30")
 	checkErr(err)
-
 	
+	p1:=Person{"Mustafa","Ustaz",d1}
 	p2:=Person{"Mukhamet","Ustaz",d2}
 	p3:=Person{"Ayzada","Ustaz",d3}
 	
 	p :=People{p1,p2,p3}
-
-	tests:=[]struct{
-		actual int
-		current int
-		expected bool
-	}{
-		{0, 0, true},
-		{1, 2, false},
-		{2, 2, true},
-	}
-	for i, v:=range tests{
-		if p[v.current]==p[v.actual]&&p[v.actual]==p[v.current]!= v.expected{
-			t.Errorf("[%d] expected: %v, got : %v", i,v.expected,p[v.current]==p[v.actual]&&p[v.actual]==p[v.current])
-		}
-	}
+	p.Swap(1,2)
+	assert.Equalf(t,p[1], p3,"Ayzada earlier")
+	assert.Equalf(t,p[2], p2,"Mukhamet later")
+	// tests:=[]struct{
+	// 	actual int
+	// 	current int
+	// 	expected bool
+	// }{
+	// 	{0, 0, true},
+	// 	{1, 2, false},
+	// 	{2, 2, true},
+	// }
+	// for i, v:=range tests{
+	// 	if p[v.current]==p[v.actual]&&p[v.actual]==p[v.current]!= v.expected{
+	// 		t.Errorf("[%d] expected: %v, got : %v", i,v.expected,p[v.current]==p[v.actual]&&p[v.actual]==p[v.current])
+	// 	}
+	// }
  }
 
 func TestNew(t *testing.T){
