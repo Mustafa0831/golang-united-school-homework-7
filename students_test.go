@@ -24,61 +24,51 @@ func init() {
 const date ="2006-01-02"
 
 func TestLen(t *testing.T){
-	d1,err:=time.Parse(date,"1997-08-31")
-	checkErr(err)
-	d2,err:=time.Parse(date,"1994-09-09")
-	checkErr(err)
-	d3,err:=time.Parse(date,"2004-01-30")
-	checkErr(err)
-	
-	p1:=Person{"Mustafa","Ustaz",d1}
-	p2:=Person{"Mukhamet","Ustaz",d2}
-	p3:=Person{"Ayzada","Ustaz",d3}
+	t.Parallel()
 
-	three:=People{p1,p2,p3}
-	zero:=People{}
-	tests:=[]struct{
-		actual People
-		expected int
-	}{
-		{three,3},
-		{zero,0},
+	tData := map[string]People{
+		"empty": make(People, 0),
+		"ten": make(People, 10),
+		"nil": nil,
 	}
-	for _,v:=range tests{
-		if v.actual.Len()!=v.expected{
-			t.Errorf("expected: %v, got: %v", v.expected,v.actual.Len())
-		}
+
+	for name, v := range tData {
+		people := v
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, people.Len(), len(people))
+		})
 	}
 }
 
  func TestLess(t *testing.T){
-	d1,err:=time.Parse(date,"1997-08-31")
-	checkErr(err)
-	d2,err:=time.Parse(date,"1994-09-09")
-	checkErr(err)
-	d3,err:=time.Parse(date,"2004-01-30")
-	checkErr(err)
-
-	p1:=Person{"Mustafa","Ustaz",d1}
-	p2:=Person{"Mukhamet","Ustaz",d2}
-	p3:=Person{"Ayzada","Ustaz",d3}
-
-	p :=People{p1,p2,p3}
-
-	tests:=[]struct{
-		actual int
-		current int
+	people := People{
+		Person{firstName: "Aza", lastName: "bro", birthDay: time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)},
+		Person{firstName: "Aika", lastName: "fu", birthDay: time.Date(2000, 2, 1, 0, 0, 0, 0, time.UTC)},
+		Person{firstName: "Kim", lastName: "Bir", birthDay: time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)},
+		Person{firstName: "Quant", lastName: "TI", birthDay: time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)}};
+	tests:= map[string]struct{
+		people People
+		i int
+		j int
 		expected bool
 	}{
-		{0, 1, true},
-		{0, 2, false},
-		{1, 2, false},
-		{2, 0, true},
-	}
-	for i, v:=range tests{
-		if p.Less(v.actual,v.current)!= v.expected{
-			t.Errorf("[%d] expected: %v, got : %v", i,v.expected, p.Less(v.actual, v.current))
-		}
+		"older": {people, 0, 1, false},
+		"younger": {people, 1, 0, true},
+		"same birthday, first name wins": {people, 0, 2, true},
+		"same birthday, first name loses": {people, 2, 0, false},
+		"same birthday and first name, last name wins": {people, 2, 3, true},
+		"same birthday and first name, last name loses": {people, 3, 2, false}}
+
+	for name, value := range tests {
+		people := value.people
+		i := value.i
+		j := value.j
+		expected := value.expected
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, expected, people.Less(i, j))
+		})
 	}
  }
 
