@@ -76,9 +76,9 @@ func TestLen(t *testing.T){
 	mukhamet := Person{firstName: "Mukhamet", lastName: "Wiedermann", birthDay: time.Date(2000, 2, 1, 0, 0, 0, 0, time.UTC)}
 	p := People{mustafa, mukhamet}
 	
-	p.Swap(1,2)
-	assert.Equalf(t,p[1], p3,"Ayzada earlier")
-	assert.Equalf(t,p[2], p2,"Mukhamet later")
+	p.Swap(0,1)
+	assert.Equalf(t,p[0], mukhamet,"Ayzada earlier")
+	assert.Equalf(t,p[1], mustafa,"Mukhamet later")
  }
 
 func TestNewNil(t *testing.T){
@@ -132,8 +132,7 @@ func TestRows(t *testing.T){
 	for i,v:=range tests{
 		t.Run(i, func(t *testing.T){
 			t.Parallel()
-			m,_:=New(v.matrix)
-			
+			m,_:=New(v.matrix)		
 			assert.Equal(t,v.expected,m.Rows())
 		})
 	}
@@ -142,18 +141,27 @@ func TestRows(t *testing.T){
 func TestCols(t *testing.T){
 	t.Parallel()
 	tests:=map[string]struct{
-		matrix string
+		matrix Matrix
 		expected [][]int
 	}{
-		"single row": {"0 1 2 3", [][]int{{0}, {1}, {2}, {3}}},
-		"multiple rows": {"0 1 2\n3 4 5\n6 7 8", [][]int{{0, 3, 6}, {1, 4, 7}, {2, 5, 8}}}} 
+		"succes": {matrix: Matrix{rows: 3, cols: 3,data: []int{1,2,3,4,5,6,7,8,9}},expected: [][]int{{1,4,7},{2,5,8},{3,6,9}}},
 	}
 	for i,v:=range tests{
 		t.Run(i, func(t *testing.T){
 			t.Parallel()
-			m,_:=New(v.matrix)
-			
-			assert.Equal(t,v.expected,m.Cols())
+			m:=v.matrix.Cols()
+			ok:=false
+			for j,val:=range m{
+				for k,value:=range val{
+					if v.expected[j][k]!=value{
+						ok=true
+						break
+					}
+				}
+			}
+			if ok{
+				t.Errorf("[%s] expected %v got %v", i, v.expected, m)
+			}
 		})
 	}
 }
