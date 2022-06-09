@@ -21,18 +21,16 @@ func init() {
 
 // WRITE YOUR CODE BELOW
 
-const date ="2006-01-02"
-
 func TestLen(t *testing.T){
 	t.Parallel()
 
-	tData := map[string]People{
+	tests := map[string]People{
 		"empty": make(People, 0),
 		"ten": make(People, 10),
 		"nil": nil,
 	}
 
-	for name, v := range tData {
+	for name, v := range tests {
 		people := v
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
@@ -74,18 +72,10 @@ func TestLen(t *testing.T){
 
  func TestSwap(t *testing.T){
 	t.Parallel()
-	d1,err:=time.Parse(date,"1997-08-31")
-	checkErr(err)
-	d2,err:=time.Parse(date,"1994-09-09")
-	checkErr(err)
-	d3,err:=time.Parse(date,"2004-01-30")
-	checkErr(err)
+	mustafa := Person{firstName: "Mustafa", lastName: "Sligo", birthDay: time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)}
+	mukhamet := Person{firstName: "Mukhamet", lastName: "Wiedermann", birthDay: time.Date(2000, 2, 1, 0, 0, 0, 0, time.UTC)}
+	p := People{mustafa, mukhamet}
 	
-	p1:=Person{"Mustafa","Ustaz",d1}
-	p2:=Person{"Mukhamet","Ustaz",d2}
-	p3:=Person{"Ayzada","Ustaz",d3}
-	
-	p :=People{p1,p2,p3}
 	p.Swap(1,2)
 	assert.Equalf(t,p[1], p3,"Ayzada earlier")
 	assert.Equalf(t,p[2], p2,"Mukhamet later")
@@ -156,7 +146,7 @@ func TestCols(t *testing.T){
 		expected [][]int
 	}{
 		"single row": {"0 1 2 3", [][]int{{0}, {1}, {2}, {3}}},
-		"multiple rows": {"0 1 2\n3 4 5\n6 7 8", [][]int{{0, 3, 6}, {1, 4, 7}, {2, 5, 8}}},
+		"multiple rows": {"0 1 2\n3 4 5\n6 7 8", [][]int{{0, 3, 6}, {1, 4, 7}, {2, 5, 8}}}} 
 	}
 	for i,v:=range tests{
 		t.Run(i, func(t *testing.T){
@@ -168,29 +158,12 @@ func TestCols(t *testing.T){
 	}
 }
 
-func getMatrix(matrix1, matrix2 [][]int)bool{
-	if len(matrix1)!= len(matrix2){
-		return false
-	}
-	for i, r1:=range matrix1{
-		r2:=matrix2[i]
-		if len(r1)!=len(r2){
-			return false
-		}
-		for j,v:=range r1{
-			if v!=r2[j]{
-				return false
-			}
-		}
-	}
-	return true
-}
 
 func TestSetFails(t *testing.T) {
 	t.Parallel()
 
 	matrix, _ := New("0 1 2")
-	tData := map[string]struct{
+	tests := map[string]struct{
 		row int
 		col int
 	}{
@@ -199,7 +172,7 @@ func TestSetFails(t *testing.T) {
 		"negative col": {0, -1},
 		"col out of range": {0, 3}}
 
-	for name, value := range tData {
+	for name, value := range tests {
 		tCase := value
 		t.Run(name, func (t *testing.T) {
 			t.Parallel()
@@ -211,7 +184,7 @@ func TestSetFails(t *testing.T) {
 func TestSet(t *testing.T) {
 	t.Parallel()
 
-	tData := map[string]struct{
+	tests := map[string]struct{
 		input string
 		row int
 		col int
@@ -220,7 +193,7 @@ func TestSet(t *testing.T) {
 		"single row": {"0 1 2", 0, 1, 3},
 		"multiple rows": {"0 1 2\n3 4 5\n6 7 8", 2, 2, 9}}
 
-	for name, value := range tData {
+	for name, value := range tests {
 		tCase := value
 		t.Run(name, func (t *testing.T) {
 			t.Parallel()
@@ -229,25 +202,4 @@ func TestSet(t *testing.T) {
 			assert.Equal(t, tCase.value, matrix.Rows()[tCase.row][tCase.col])
 		})
 	}
-}
-
-func equal(matrix1, matrix2 *Matrix)bool{
-	if matrix1==matrix2{
-		return true
-	}
-	if matrix1.cols==matrix2.cols && matrix1.rows==matrix2.rows &&len(matrix1.data)==len(matrix2.data) {
-		for i,v:=range matrix1.data{
-			if v!=matrix2.data[i]{
-				return false
-			}
-		}
-		return true
-	}
-	return false
-}
-
-func checkErr(err error){
-	if err != nil {
-        panic(err)
-    }
 }
