@@ -4,7 +4,6 @@ import (
 	"os"
 	"testing"
 	"time"
-	"github.com/stretchr/testify/assert"
 )
 
 // DO NOT EDIT THIS FUNCTION
@@ -22,192 +21,211 @@ func init() {
 // WRITE YOUR CODE BELOW
 
 func TestLen(t *testing.T){
-	t.Parallel()
-
-	tests := map[string]People{
-		"empty": make(People, 0),
-		"ten": make(People, 10),
-		"nil": nil,
+	var p People
+	p = append(p, Person{firstName: "firstName", lastName: "Test_lastName", birthDay: time.Now() })
+	p = append(p, Person{firstName: "firstName1", lastName: "Test_lastName1", birthDay: time.Now().Add(time.Minute * 2) })
+	length := p.Len()
+	if length != 2 {
+		t.Error("eln shouldn't be equal 2 ", length)
 	}
 
-	for name, v := range tests {
-		people := v
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-			assert.Equal(t, people.Len(), len(people))
-		})
-	}
 }
 
- func TestLess(t *testing.T){
-	people := People{
-		Person{firstName: "Aza", lastName: "bro", birthDay: time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)},
-		Person{firstName: "Aika", lastName: "fu", birthDay: time.Date(2000, 2, 1, 0, 0, 0, 0, time.UTC)},
-		Person{firstName: "Kim", lastName: "Bir", birthDay: time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)},
-		Person{firstName: "Quant", lastName: "TI", birthDay: time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)}};
-	tests:= map[string]struct{
-		people People
-		i int
-		j int
-		expected bool
-	}{
-		"older": {people, 0, 1, false},
-		"younger": {people, 1, 0, true},
-		"same birthday, first name wins": {people, 0, 2, true},
-		"same birthday, first name loses": {people, 2, 0, false},
-		"same birthday and first name, last name wins": {people, 2, 3, true},
-		"same birthday and first name, last name loses": {people, 3, 2, false}}
+func TestLess(t *testing.T){
+	var p People
+	p = append(p, Person{firstName: "firstNam", lastName: "Test_lastName", birthDay: time.Now().Add(time.Minute *2) })
+	p = append(p, Person{firstName: "firstName1", lastName: "Test_lastName1", birthDay: time.Now() })
 
-	for name, value := range tests {
-		people := value.people
-		i := value.i
-		j := value.j
-		expected := value.expected
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-			assert.Equal(t, expected, people.Less(i, j))
-		})
-	}
- }
-
- func TestSwap(t *testing.T){
-	t.Parallel()
-	mustafa := Person{firstName: "Mustafa", lastName: "Sligo", birthDay: time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)}
-	mukhamet := Person{firstName: "Mukhamet", lastName: "Wiedermann", birthDay: time.Date(2000, 2, 1, 0, 0, 0, 0, time.UTC)}
-	p := People{mustafa, mukhamet}
 	
+	less := p.Less(0,1)
+
+	if less != true{
+		t.Error(" ", less)
+	}
+}
+
+func TestLessError(t *testing.T){
+	var p People
+	t1 := time.Now()
+	p = append(p, Person{firstName: "firstName", lastName: "Test_lastName", birthDay: t1 })
+	p = append(p, Person{firstName: "firstName", lastName: "Test_lastName1", birthDay: t1 })
+
+	
+	less := p.Less(0,1)
+
+	if less != true{
+		t.Error("if it's not true ", less)
+	}
+}
+
+func TestLessError1(t *testing.T){
+	var p People
+	t1 := time.Now()
+	p = append(p, Person{firstName: "firstName", lastName: "Test_lastName", birthDay: t1 })
+	p = append(p, Person{firstName: "firstName1", lastName: "Test_lastName1", birthDay: t1 })
+
+	
+	err := p.Less(0,1)
+
+	if err != true{
+		t.Error("if it's not true  ", err)
+	}
+}
+
+
+func TestSwap(t *testing.T){
+	var p People
+	p = append(p, Person{firstName: "firstNam", lastName: "Test_lastName", birthDay: time.Now().Add(time.Minute *2) })
+	p = append(p, Person{firstName: "firstName1", lastName: "Test_lastName1", birthDay: time.Now() })
+
+	p0 := p[0]
+
 	p.Swap(0,1)
-	assert.Equalf(t,p[0], mukhamet,"Ayzada earlier")
-	assert.Equalf(t,p[1], mustafa,"Mukhamet later")
- }
 
-func TestNewNil(t *testing.T){
-	t.Parallel()
-	tests:=map[string]string{
-		"nil" : "",
-		"matrix" : "0 2\n0 5 8",
-	}
-	for i, test:=range tests{
-		t.Run(i,func(t *testing.T){
-			t.Parallel()
-			expected,err:=New(test)
-			assert.NotNil(t,err)
-			assert.Nil(t,expected)
-		})
+
+	if p0 == p[0]{
+
+		t.Error("didn't changed", p[0])
 	}
 }
 
-func TestNewNotNil(t *testing.T){
-	t.Parallel()
-	tests:=map[string]struct{
-		matrix string
-		row, col int
-	}{
-		"single row": {"0 1 2 3", 1, 4},
-		"multiple rows": {"0 1 2\n3 4 5\n6 7 8", 3, 3},
-		"multiple rows with leading and trailing spaces": {" 0 1 2\n 3 4 5 \n6 7 8 ", 3, 3},
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+func TestNewMatrix(t *testing.T){
+
+	_, err := New("10 20 30 40 50 60 70 80 90")
+	if err != nil {
+		t.Error("can't create matrix")
 	}
-	for i,test:=range tests{
-		t.Run(i,func(t *testing.T){
-			t.Parallel()
-			expected,err:=New(test.matrix)
-			assert.Nil(t,err)
-			assert.NotNil(t,expected)
-			assert.NotNil(t,expected.data)
-			assert.Equal(t,test.row,expected.rows)
-			assert.Equal(t,test.col,expected.cols)
-		})
+
+
+}
+
+func TestNewMatrixError1(t *testing.T){
+
+	m, err1 := New("10 20 30 40 50 60 70 80 90 \n 10 20 30 \n")
+	if err1 == nil || m != nil{
+		t.Error("can't create matrix ")
+	}
+
+
+}
+
+func TestNewMatrixError2(t *testing.T){
+	
+	m0, err2 := New(" ")
+	if err2 == nil || m0 != nil{
+		t.Error("can't create matrix ")
+	}
+
+}
+
+func TestNewMatrixError3(t *testing.T){
+	
+	m0, err3 := New("10 20 30 40 50 60 70 80 90 \n 10, 20, 30, 40, 50, 60, 70, 80, 90")
+	if err3 == nil || m0 != nil{
+		t.Error("can't create matrix ")
+	}
+
+}
+
+func TestNewMatrixCols(t *testing.T){
+
+	
+
+	m, err := New("10 20 30 40 50 60 70 80 90")
+	if err != nil {
+		t.Error("can't create matrix")
+	}
+
+	var cols0 [][]int
+	for i :=0; i < 9; i++{
+		cols0 = append(cols0, []int{(i+1)*10})
+	} 
+
+	cols := m.Cols()
+
+
+
+	b := compareSlices(cols, cols0)
+	if b != true {
+		t.Error("can't compare slice")
+	}
+
+}
+
+func TestNewMatrixRows(t *testing.T){
+
+	
+
+	m, err := New("10 20 30 40 50 60 70 80 90")
+	if err != nil {
+		t.Error("can't get new slice")
+	}
+
+
+	s := []int{10,20,30,40,50,60,70,80,90}
+
+	var rows0 [][]int
+		rows0 = append(rows0, s)
+
+	rows := m.Rows()
+
+	b0 := compareSlicesR(rows, rows0)
+	if b0 != true {
+		t.Error("can't get new slice")
 	}
 }
 
-func TestRows(t *testing.T){
-	t.Parallel()
-	tests:=map[string]struct{
-		matrix string
-		expected [][]int
-	}{
-		"single row": {"0 1 2 3", [][]int{{0, 1, 2, 3}}},
-		"multiple rows": {"0 1 2\n3 4 5\n6 7 8", [][]int{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}}},
-	}
-	for i,v:=range tests{
-		t.Run(i, func(t *testing.T){
-			t.Parallel()
-			m,_:=New(v.matrix)		
-			assert.Equal(t,v.expected,m.Rows())
-		})
-	}
-}
+func TestNewMatrixSet(t *testing.T){
 
-func TestCols(t *testing.T){
-	t.Parallel()
-	tests:=map[string]struct{
-		matrix Matrix
-		expected [][]int
-	}{
-		"succes": {matrix: Matrix{rows: 3, cols: 3,data: []int{1,2,3,4,5,6,7,8,9}},expected: [][]int{{1,4,7},{2,5,8},{3,6,9}}},
+	
+
+	m, err := New("10 20 30 40 50 60 70 80 90")
+	if err != nil {
+		t.Error("can't set new matrix")
 	}
-	for i,v:=range tests{
-		t.Run(i, func(t *testing.T){
-			t.Parallel()
-			m:=v.matrix.Cols()
-			ok:=false
-			for j,val:=range m{
-				for k,value:=range val{
-					if v.expected[j][k]!=value{
-						ok=true
-						break
-					}
-				}
-			}
-			if ok{
-				t.Errorf("[%s] expected %v got %v", i, v.expected, m)
-			}
-		})
+
+
+	n := m.Set(0,1, 77)
+
+	n0 := m.Set(-1,10,77)
+
+	if !n || m.data[1] != 77 {
+		t.Error("can't set new matrix")
 	}
+
+	if n0 != false {
+		t.Error("can't set new matrix")
+	}
+
 }
 
 
-func TestSetFails(t *testing.T) {
-	t.Parallel()
-
-	matrix, _ := New("0 1 2")
-	tests := map[string]struct{
-		row int
-		col int
-	}{
-		"negative row": {-1, 0},
-		"row out of range": {1, 0},
-		"negative col": {0, -1},
-		"col out of range": {0, 3}}
-
-	for name, value := range tests {
-		tCase := value
-		t.Run(name, func (t *testing.T) {
-			t.Parallel()
-			assert.False(t, matrix.Set(tCase.row, tCase.col, 100))
-		})
+func compareSlices(s1, s2 [][]int) bool {
+	if len(s1) != len(s2) {
+	return false
 	}
-}
-
-func TestSet(t *testing.T) {
-	t.Parallel()
-
-	tests := map[string]struct{
-		input string
-		row int
-		col int
-		value int
-	}{
-		"single row": {"0 1 2", 0, 1, 3},
-		"multiple rows": {"0 1 2\n3 4 5\n6 7 8", 2, 2, 9}}
-
-	for name, value := range tests {
-		tCase := value
-		t.Run(name, func (t *testing.T) {
-			t.Parallel()
-			matrix, _ := New(tCase.input)
-			assert.True(t, matrix.Set(tCase.row, tCase.col, tCase.value))
-			assert.Equal(t, tCase.value, matrix.Rows()[tCase.row][tCase.col])
-		})
+	
+	for i := 0; i < len(s1); i++ {
+	if s1[i][0] != s2[i][0] {
+	return false
 	}
-}
+	}
+	
+	return true
+   }
+
+   func compareSlicesR(s1, s2 [][]int) bool {
+	if len(s1) != len(s2) {
+	return false
+	}
+	
+	for i := 0; i < len(s1); i++ {
+	if s1[0][i] != s2[0][i] {
+	return false
+	}
+	}
+	
+	return true
+   }
